@@ -4,6 +4,7 @@ import os
 from src.data_loader import clean_missing_values
 from src.preprocessing import encode_labels, split_data, scale_features
 from src.genetic_programming import setup_gp, run_active_learning_ga
+from src.ensemble_learning import GPEnsembleClassifier
 from sklearn.metrics import classification_report
 
 def main():
@@ -61,13 +62,38 @@ def main():
     print(f"\nBest Individual found: {best_ind}")
     print(f"Best Fitness (Accuracy): {best_ind.fitness.values[0]:.4f}")
     
-    # Evaluation on Test Set
-    print("\nEvaluating on Test Set...")
-    func = toolbox.compile(expr=best_ind)
-    test_preds = [1 if func(*p) > 0 else 0 for p in X_test_scaled]
+    # Selection of Top N for Ensemble
+    # Sort population by fitness and take top 10
+    sorted_pop = sorted(pop, key=lambda ind: ind.fitness.values[0], reverse=True)
+    top_n = 10
+    ensemble_pop = sorted_pop[:top_n]
+    print(f"\nCreating Ensemble from Top {len(ensemble_pop)} individuals...")
     
-    print("\nClassification Report (Test Set):")
-    print(classification_report(y_test, test_preds, target_names=le.classes_))
+    ensemble = GPEnsembleClassifier(ensemble_pop, toolbox)
+    
+    # Evaluation on Test Set
+    print("\n--- Evaluating Models on Test Set ---")
+    
+    # 1. Best Individual
+    func = toolbox.compile(expr=best_ind)
+    best_ind_preds = [1 if func(*p) > 0 else 0 for p in X_test_scaled]
+    print("\n[Best Individual Classifier]")
+    print(classification_report(y_test, best_ind_preds, target_names=le.classes_))
+    
+    # 2. Ensemble - Hard Voting
+    hard_preds = ensemble.predict(X_test_scaled, voting='hard')
+    print("\n[Ensemble - Hard Voting]")
+    print(classification_report(y_test, hard_preds, target_names=le.classes_))
+    
+    # 3. Ensemble - Soft Voting
+    soft_preds = ensemble.predict(X_test_scaled, voting='soft')
+    print("\n[Ensemble - Soft Voting]")
+    print(classification_report(y_test, soft_preds, target_names=le.classes_))
+    
+    # 4. Ensemble - Weighted Voting (Alternative Solution)
+    weighted_preds = ensemble.predict(X_test_scaled, voting='weighted')
+    print("\n[Ensemble - Weighted Voting (Alternative)]")
+    print(classification_report(y_test, weighted_preds, target_names=le.classes_))
 
 if __name__ == "__main__":
     main()
