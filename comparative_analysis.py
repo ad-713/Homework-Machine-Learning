@@ -81,7 +81,8 @@ def main():
     print(f"Loading data subset from {raw_data_path}...")
     
     try:
-        df = pd.read_csv(raw_data_path, nrows=5000)
+        # Increased dataset size for better accuracy
+        df = pd.read_csv(raw_data_path, nrows=50000)
     except FileNotFoundError:
         print(f"Error: {raw_data_path} not found.")
         return
@@ -97,8 +98,9 @@ def main():
     # Common GP Params
     n_features = X_train_scaled.shape[1]
     pset, toolbox = setup_gp(n_features)
-    n_gen = 10
-    pop_size = 50
+    # Optimized GA parameters
+    n_gen = 40
+    pop_size = 200
     
     results = {}
 
@@ -115,7 +117,9 @@ def main():
 
     # 2. Random Sampling (Baseline - Limited Data)
     print("\n>>> Running Random Sampling (Baseline - Limited Data)...")
-    n_al_total = 260 # 200 initial + 3 steps * 20 instances
+    # Match the budget used in GA+AL
+    # 1000 initial + 10 steps (4, 8, 12, 16, 20, 24, 28, 32, 36, 40) * 100 instances = 2000
+    n_al_total = 2000
     indices = np.random.choice(len(X_train_scaled), n_al_total, replace=False)
     X_train_random = X_train_scaled[indices]
     y_train_random = y_train.values[indices]
@@ -132,7 +136,8 @@ def main():
     # 3. GA + AL
     print("\n>>> Running GA + Active Learning...")
     # Setup for AL
-    n_initial = 200
+    # Improved AL parameters: Larger initial pool and more instances per query
+    n_initial = 1000
     X_train_initial = X_train_scaled[:n_initial]
     y_train_initial = y_train.values[:n_initial]
     X_pool = X_train_scaled[n_initial:]
@@ -140,11 +145,11 @@ def main():
     
     start_time = time.time()
     pop_al, _, hof_al = run_active_learning_ga(
-        X_train_initial, y_train_initial, 
-        X_pool, y_pool, 
-        pset, toolbox, 
-        n_gen=n_gen, pop_size=pop_size, 
-        k=3, n_instances=20
+        X_train_initial, y_train_initial,
+        X_pool, y_pool,
+        pset, toolbox,
+        n_gen=n_gen, pop_size=pop_size,
+        k=4, n_instances=100
     )
     elapsed_al = time.time() - start_time
     
@@ -158,8 +163,19 @@ def main():
     # We use the population from GA+AL run to create ensemble
     start_time = time.time()
     # Sorted by fitness
+    # Ensure diversity by selecting unique individuals from the population
     sorted_pop = sorted(pop_al, key=lambda ind: ind.fitness.values[0], reverse=True)
-    ensemble = GPEnsembleClassifier(sorted_pop[:10], toolbox)
+    unique_inds = []
+    seen_exprs = set()
+    for ind in sorted_pop:
+        expr_str = str(ind)
+        if expr_str not in seen_exprs:
+            unique_inds.append(ind)
+            seen_exprs.add(expr_str)
+        if len(unique_inds) >= 10:
+            break
+            
+    ensemble = GPEnsembleClassifier(unique_inds, toolbox)
     preds_el = ensemble.predict(X_test_scaled, voting='soft')
     elapsed_el = elapsed_al + (time.time() - (start_time + elapsed_al)) # Time to train + time to ensemble
     # Actually training time for GA+AL+EL is AL time + negligible ensemble creation time
