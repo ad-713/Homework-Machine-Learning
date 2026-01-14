@@ -89,7 +89,7 @@ def main():
     # Preprocessing
     df = clean_missing_values(df)
     df, le = encode_labels(df)
-    X_train, X_test, y_train, y_test, _, _ = split_data(df, test_size=0.3)
+    X_train, X_test, y_train, y_test, _, _, m_train, _ = split_data(df, test_size=0.3)
     X_train_scaled, X_test_scaled, _ = scale_features(X_train, X_test)
     
     y_test_vals = y_test.values
@@ -137,14 +137,16 @@ def main():
     y_train_initial = y_train.values[:n_initial]
     X_pool = X_train_scaled[n_initial:]
     y_pool = y_train.values[n_initial:]
+    mask_pool = m_train[n_initial:]
     
     start_time = time.time()
     pop_al, _, hof_al = run_active_learning_ga(
-        X_train_initial, y_train_initial, 
-        X_pool, y_pool, 
-        pset, toolbox, 
-        n_gen=n_gen, pop_size=pop_size, 
-        k=3, n_instances=20
+        X_train_initial, y_train_initial,
+        X_pool, y_pool,
+        pset, toolbox,
+        n_gen=n_gen, pop_size=pop_size,
+        k=3, n_instances=20,
+        mask_pool=mask_pool
     )
     elapsed_al = time.time() - start_time
     

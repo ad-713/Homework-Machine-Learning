@@ -103,22 +103,25 @@ def apply_pca(X_train, X_test, n_components=0.90):
 def split_data(df, test_size=0.3, random_state=42):
     """
     Split the dataframe into training and testing sets.
-    Returns X_train, X_test, y_train, y_test, and weights if available.
+    Returns X_train, X_test, y_train, y_test, weights, and missing_mask.
     """
-    metadata_cols = ['EventId', 'Weight', 'KaggleSet', 'KaggleWeight', 'Label']
+    metadata_cols = ['EventId', 'Weight', 'KaggleSet', 'KaggleWeight', 'Label', 'HasMissing']
     feature_cols = [col for col in df.columns if col not in metadata_cols]
     
     X = df[feature_cols]
     y = df['Label']
-    weights = df['Weight'] if 'Weight' in df.columns else None
     
-    if weights is not None:
-        X_train, X_test, y_train, y_test, w_train, w_test = train_test_split(
-            X, y, weights, test_size=test_size, random_state=random_state, stratify=y
-        )
-        return X_train, X_test, y_train, y_test, w_train, w_test
-    else:
-        X_train, X_test, y_train, y_test = train_test_split(
-            X, y, test_size=test_size, random_state=random_state, stratify=y
-        )
-        return X_train, X_test, y_train, y_test, None, None
+    # Handle optional metadata
+    weights = df['Weight'] if 'Weight' in df.columns else pd.Series([1.0] * len(df))
+    mask = df['HasMissing'] if 'HasMissing' in df.columns else pd.Series([False] * len(df))
+    
+    # Bundle metadata to split it consistently
+    meta = pd.concat([weights.rename('w'), mask.rename('m')], axis=1)
+    
+    X_train, X_test, y_train, y_test, meta_train, meta_test = train_test_split(
+        X, y, meta, test_size=test_size, random_state=random_state, stratify=y
+    )
+    
+    return (X_train, X_test, y_train, y_test,
+            meta_train['w'].values, meta_test['w'].values,
+            meta_train['m'].values, meta_test['m'].values)

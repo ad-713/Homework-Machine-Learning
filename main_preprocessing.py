@@ -38,7 +38,7 @@ def main():
     joblib.dump(label_encoder, os.path.join(output_dir, 'label_encoder.joblib'))
     
     print("Splitting data...")
-    X_train, X_test, y_train, y_test, w_train, w_test = split_data(df)
+    X_train, X_test, y_train, y_test, w_train, w_test, m_train, m_test = split_data(df)
     print(f"Train shape: {X_train.shape}, Test shape: {X_test.shape}")
     
     print("Scaling features using RobustScaler...")
@@ -51,8 +51,8 @@ def main():
     print(f"PCA reduced dimensions from {X_train_scaled.shape[1]} to {X_train_pca.shape[1]}")
     
     print("Saving processed data...")
-    np.savez(os.path.join(output_dir, 'train_data.npz'), X=X_train_pca, y=y_train, w=w_train)
-    np.savez(os.path.join(output_dir, 'test_data.npz'), X=X_test_pca, y=y_test, w=w_test)
+    np.savez(os.path.join(output_dir, 'train_data.npz'), X=X_train_pca, y=y_train, w=w_train, m=m_train)
+    np.savez(os.path.join(output_dir, 'test_data.npz'), X=X_test_pca, y=y_test, w=w_test, m=m_test)
     
     print("Preprocessing complete. Files saved in 'processed_data/'")
 
