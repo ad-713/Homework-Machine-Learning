@@ -12,9 +12,9 @@ def main():
     raw_data_path = 'data/atlas-higgs-challenge-2014-v2.csv'
     print(f"Loading data subset from {raw_data_path}...")
     
-    # Read first 50000 rows for better accuracy
+    # Read first 5000 rows for a better AL demonstration
     try:
-        df = pd.read_csv(raw_data_path, nrows=50000)
+        df = pd.read_csv(raw_data_path, nrows=5000)
     except FileNotFoundError:
         print(f"Error: {raw_data_path} not found. Please ensure the dataset is in the data/ directory.")
         return
@@ -31,8 +31,8 @@ def main():
     X_train_scaled, X_test_scaled, scaler = scale_features(X_train, X_test)
     
     # Active Learning Split: Initial Train vs Pool
-    # We take 1000 samples for initial training
-    n_initial = 1000
+    # We take 200 samples for initial training
+    n_initial = 200
     X_train_initial = X_train_scaled[:n_initial]
     y_train_initial = y_train.values[:n_initial]
     
@@ -49,13 +49,13 @@ def main():
     
     # Run GA with Active Learning
     print("Starting Evolutionary Loop with Active Learning (Uncertainty Sampling)...")
-    # Step every 4 generations, add 100 samples
+    # Step every 3 generations, add 20 samples
     pop, log, hof = run_active_learning_ga(
-        X_train_initial, y_train_initial,
-        X_pool, y_pool,
-        pset, toolbox,
-        n_gen=40, pop_size=200,
-        k=4, n_instances=100
+        X_train_initial, y_train_initial, 
+        X_pool, y_pool, 
+        pset, toolbox, 
+        n_gen=10, pop_size=50, 
+        k=3, n_instances=20
     )
     
     best_ind = hof[0]
@@ -63,19 +63,11 @@ def main():
     print(f"Best Fitness (Accuracy): {best_ind.fitness.values[0]:.4f}")
     
     # Selection of Top N for Ensemble
-    # Sort population by fitness and take top unique 10
+    # Sort population by fitness and take top 10
     sorted_pop = sorted(pop, key=lambda ind: ind.fitness.values[0], reverse=True)
-    ensemble_pop = []
-    seen_exprs = set()
-    for ind in sorted_pop:
-        expr_str = str(ind)
-        if expr_str not in seen_exprs:
-            ensemble_pop.append(ind)
-            seen_exprs.add(expr_str)
-        if len(ensemble_pop) >= 10:
-            break
-            
-    print(f"\nCreating Ensemble from Top {len(ensemble_pop)} unique individuals...")
+    top_n = 10
+    ensemble_pop = sorted_pop[:top_n]
+    print(f"\nCreating Ensemble from Top {len(ensemble_pop)} individuals...")
     
     ensemble = GPEnsembleClassifier(ensemble_pop, toolbox)
     

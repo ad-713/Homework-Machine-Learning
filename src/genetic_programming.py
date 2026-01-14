@@ -50,27 +50,15 @@ class GPClassifierWrapper:
                 probs.append([0.5, 0.5]) # Maximum uncertainty on error
         return np.array(probs)
 
-def protected_div(left, right):
-    """
-    Protected division to avoid ZeroDivisionError.
-    """
-    try:
-        if abs(right) < 1e-6:
-            return 1.0
-        return left / right
-    except (ZeroDivisionError, OverflowError):
-        return 1.0
-
 def setup_gp(n_features):
     """
     Sets up the DEAP GP environment.
     """
-    # Define primitives: addition, subtraction, multiplication, protected division
+    # Define primitives: addition, subtraction, multiplication
     pset = gp.PrimitiveSet("MAIN", n_features)
     pset.addPrimitive(operator.add, 2)
     pset.addPrimitive(operator.sub, 2)
     pset.addPrimitive(operator.mul, 2)
-    pset.addPrimitive(protected_div, 2)
     
     # Define fitness and individual
     if not hasattr(creator, "FitnessMax"):
