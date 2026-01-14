@@ -62,21 +62,25 @@ The following table summarizes the key performance indicators. Notably, the Acti
 As illustrated in Figure 1, the GA+AL approach (green) significantly outperforms the baseline GA (blue) in terms of Recall and F1-Score, demonstrating the effectiveness of targeted sampling.
 
 ![Metrics Comparison](experiment/plots/metrics_comparison.png)
+
 *Figure 1: Comparative bar chart of Accuracy, Precision, Recall, and F1-Score across all methods.*
 
 **Computational Efficiency:**
 Figure 2 highlights the dramatic reduction in computational cost. The Active Learning approach yields a speedup of approximately 9x compared to the full-batch GA, making it highly efficient for iterative experimentation.
 
 ![Time Comparison](experiment/plots/time_comparison.png)
+
 *Figure 2: Training time comparison (in seconds).*
 
 **Ensemble Performance:**
 The ensemble method's ability to distinguish classes is further detailed in the Confusion Matrix (Figure 3) and ROC Curve (Figure 4). While the ensemble sacrificed some recall compared to the single best AL individual, it achieved the highest precision, reducing false positives.
 
 ![Confusion Matrix](experiment/plots/confusion_matrix.png)
+
 *Figure 3: Confusion Matrix for the Ensemble Classifier.*
 
 ![ROC Curve](experiment/plots/roc_curve.png)
+
 *Figure 4: Receiver Operating Characteristic (ROC) Curve.*
 
 ## 4. Discussion
