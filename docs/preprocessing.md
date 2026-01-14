@@ -8,13 +8,12 @@ The preprocessing pipeline is orchestrated by [`main_preprocessing.py`](../main_
 
 ### Key Steps
 
-1. **Data Loading & Cleaning**
-2. **Exploratory Data Analysis (EDA)**
-3. **Missing Value Handling (SimpleImputer)**
-4. **Label Encoding**
-5. **Stratified Data Splitting**
-6. **Feature Scaling (RobustScaler)**
-7. **Dimensionality Reduction (PCA)**
+1. **Data Loading**
+2. **Missing Value Handling**
+3. **Label Encoding**
+4. **Data Splitting**
+5. **Feature Scaling (Normalization)**
+6. **Dimensionality Reduction (PCA)**
 
 ---
 
@@ -22,75 +21,42 @@ The preprocessing pipeline is orchestrated by [`main_preprocessing.py`](../main_
 
 The raw data is loaded from `data/atlas-higgs-challenge-2014-v2.csv` using [`src/data_loader.py`](../src/data_loader.py).
 
-### Initial Cleanup
-Before processing, superfluous columns `EventId`, `Weight`, `KaggleSet`, and `KaggleWeight` are removed to focus on the feature set.
+### Handling Missing Values
+The Higgs Boson dataset uses `-999.0` as a placeholder for missing values. These are addressed in the `clean_missing_values()` function:
+- **Detection**: All instances of `-999.0` are replaced with `NaN`.
+- **Imputation**: Missing values in numeric feature columns are imputed using the **median** of the respective column. Median imputation was chosen over mean to provide robustness against potential outliers in the physical measurements.
 
----
-
-## 2. Exploratory Data Analysis (EDA) & Decisions
-
-An EDA was performed to understand the data characteristics and inform preprocessing decisions.
-
-### Class Balance
-*   **Background (b):** 65.83%
-*   **Signal (s):** 34.17%
-*   **Imbalance Ratio:** 1.93
-
-**Decision:** The dataset is moderately imbalanced. We implemented **Stratified Splitting** to ensure this ratio is maintained in both training and testing sets.
-
-### Outlier Detection (IQR Method)
-Significant outliers were detected in several features, often related to the imputation of missing physical quantities (originally -999.0).
-
-| Feature | Outlier Count | Percentage |
-| :--- | :--- | :--- |
-| `DER_mass_jet_jet` | 237,984 | 29.08% |
-| `PRI_jet_subleading_pt` | 237,980 | 29.08% |
-| `PRI_jet_leading_eta` | 184,023 | 22.49% |
-| ... | ... | ... |
-
-**Decision:**
-1.  **RobustScaler:** Standard scaling (Mean/Std) is sensitive to these outliers. We switched to **`RobustScaler`** (Median/IQR) to effectively handle the heavy tails and outliers.
-2.  **PCA Variance:** To reduce the impact of noise and outliers further, the PCA variance retention was adjusted to **90%** (from 95%).
-
----
-
-## 3. Handling Missing Values
-
-The Higgs Boson dataset uses `-999.0` as a placeholder for missing values.
-*   **Implementation:** We utilize Scikit-learn's `SimpleImputer` with the **median** strategy.
-*   **Justification:** Median imputation is robust to the skewed distributions observed in the physical variables.
-
----
-
-## 4. Feature Engineering & Preparation
+## 2. Feature Engineering & Preparation
 
 Implemented in [`src/preprocessing.py`](../src/preprocessing.py).
 
 ### Label Encoding
 The target variable `Label` contains two classes:
-- `s` (Signal) -> `1`
-- `b` (Background) -> `0`
+- `s` (Signal)
+- `b` (Background)
 
-### Stratified Data Splitting
-The dataset is split into training and testing sets using an **70/30 ratio**.
-- **Stratification:** Enabled to preserve the 1.93 imbalance ratio.
-- **Random Seed:** `42` for reproducibility.
+The `encode_labels()` function converts these categorical labels into numeric values: `1` for signal and `0` for background, making them compatible with Scikit-learn classifiers.
+
+### Data Splitting
+The dataset is split into training and testing sets using an **80/20 ratio**.
+- **Random Seed**: `42` is used to ensure reproducibility across different runs.
+- **Weights**: The dataset includes a `Weight` column which is preserved and split alongside the features and labels, as it is often required for calculating the Approximate Median Significance (AMS) metric.
 
 ---
 
-## 5. Normalization and Dimensionality Reduction
+## 3. Normalization and Dimensionality Reduction
 
-### Feature Scaling (RobustScaler)
-We apply `RobustScaler` to transform features. Unlike `StandardScaler`, `RobustScaler` uses the median and the interquartile range (IQR), making it robust to the significant outliers identified during EDA.
+### Feature Scaling
+To ensure uniform scaling across all physical measurements (which vary significantly in magnitude), we apply `StandardScaler`. This transforms features to have a mean of 0 and a standard deviation of 1.
 
 ### Dimensionality Reduction (PCA)
-To improve computational efficiency and reduce noise:
-- **Variance Retained:** **90%**.
-- **Benefit:** Reduces dimensionality while keeping the most significant signal, filtering out variance that might be attributed to noise or outliers.
+To improve computational efficiency and reduce noise, Principal Component Analysis (PCA) is applied:
+- **Variance Retained**: 95% of the total variance is preserved.
+- **Result**: In the initial run, the feature space was reduced from **30 to 20 dimensions**.
 
 ---
 
-## 6. Output Artifacts
+## 4. Output Artifacts
 
 After running the pipeline, the following artifacts are generated in the `processed_data/` directory:
 
@@ -98,8 +64,8 @@ After running the pipeline, the following artifacts are generated in the `proces
 | --- | --- |
 | `train_data.npz` | Compressed NumPy archive containing `X_train`, `y_train`, and `w_train`. |
 | `test_data.npz` | Compressed NumPy archive containing `X_test`, `y_test`, and `w_test`. |
-| `scaler.joblib` | The fitted `RobustScaler` object. |
-| `pca.joblib` | The fitted `PCA` object. |
+| `scaler.joblib` | The fitted `StandardScaler` object for future inference. |
+| `pca.joblib` | The fitted `PCA` object for future inference. |
 | `label_encoder.joblib` | The fitted `LabelEncoder` object. |
 
 ## How to Run
