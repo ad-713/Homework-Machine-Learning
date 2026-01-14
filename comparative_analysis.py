@@ -102,8 +102,8 @@ def main():
     
     results = {}
 
-    # 1. GA (Baseline)
-    print("\n>>> Running GA (Baseline)...")
+    # 1. GA (Baseline - Full Data)
+    print("\n>>> Running GA (Baseline - Full Data)...")
     start_time = time.time()
     pop_ga, _, hof_ga = run_ga(X_train_scaled, y_train.values, pset, toolbox, n_gen=n_gen, pop_size=pop_size)
     elapsed_ga = time.time() - start_time
@@ -113,7 +113,23 @@ def main():
     preds_ga = [1 if func_ga(*p) > 0 else 0 for p in X_test_scaled]
     results['GA'] = evaluate_model(y_test_vals, preds_ga, elapsed_ga)
 
-    # 2. GA + AL
+    # 2. Random Sampling (Baseline - Limited Data)
+    print("\n>>> Running Random Sampling (Baseline - Limited Data)...")
+    n_al_total = 260 # 200 initial + 3 steps * 20 instances
+    indices = np.random.choice(len(X_train_scaled), n_al_total, replace=False)
+    X_train_random = X_train_scaled[indices]
+    y_train_random = y_train.values[indices]
+    
+    start_time = time.time()
+    _, _, hof_random = run_ga(X_train_random, y_train_random, pset, toolbox, n_gen=n_gen, pop_size=pop_size)
+    elapsed_random = time.time() - start_time
+    
+    best_ind_random = hof_random[0]
+    func_random = toolbox.compile(expr=best_ind_random)
+    preds_random = [1 if func_random(*p) > 0 else 0 for p in X_test_scaled]
+    results['Random'] = evaluate_model(y_test_vals, preds_random, elapsed_random)
+
+    # 3. GA + AL
     print("\n>>> Running GA + Active Learning...")
     # Setup for AL
     n_initial = 200
