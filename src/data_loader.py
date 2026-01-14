@@ -12,16 +12,13 @@ def load_higgs_data(csv_path):
 def clean_missing_values(df, missing_val=-999.0):
     """
     Handle missing values represented by -999.0.
-    Uses SimpleImputer with median strategy and adds a 'HasMissing' indicator.
+    Uses SimpleImputer with median strategy.
     """
+    df_cleaned = df.replace(missing_val, np.nan)
+    
     # Identify numeric columns (excluding metadata and label)
     metadata_cols = ['EventId', 'Weight', 'KaggleSet', 'KaggleWeight', 'Label']
-    feature_cols = [col for col in df.columns if col not in metadata_cols]
-
-    # Create missing indicator: True if ANY feature column is missing
-    df['HasMissing'] = df[feature_cols].eq(missing_val).any(axis=1)
-
-    df_cleaned = df.replace(missing_val, np.nan)
+    feature_cols = [col for col in df_cleaned.columns if col not in metadata_cols]
     
     # Initialize SimpleImputer with median strategy
     imputer = SimpleImputer(strategy='median')

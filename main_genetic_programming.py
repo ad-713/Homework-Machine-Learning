@@ -25,7 +25,7 @@ def main():
     print("Cleaning and preprocessing data...")
     df = clean_missing_values(df)
     df, le = encode_labels(df)
-    X_train, X_test, y_train, y_test, _, _, m_train, _ = split_data(df, test_size=0.3)
+    X_train, X_test, y_train, y_test, _, _ = split_data(df, test_size=0.3)
     
     # Scaling
     X_train_scaled, X_test_scaled, scaler = scale_features(X_train, X_test)
@@ -38,7 +38,6 @@ def main():
     
     X_pool = X_train_scaled[n_initial:]
     y_pool = y_train.values[n_initial:]
-    mask_pool = m_train[n_initial:]
     
     print(f"Initial Training Set size: {len(X_train_initial)}")
     print(f"Unlabeled Pool size: {len(X_pool)}")
@@ -56,8 +55,7 @@ def main():
         X_pool, y_pool, 
         pset, toolbox, 
         n_gen=10, pop_size=50, 
-        k=3, n_instances=20,
-        mask_pool=mask_pool
+        k=3, n_instances=20
     )
     
     best_ind = hof[0]

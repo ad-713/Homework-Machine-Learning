@@ -88,10 +88,9 @@ def eval_classifier(individual, points, labels, toolbox):
     except (OverflowError, ZeroDivisionError, ValueError):
         return (0.0,)
 
-def run_active_learning_ga(X_train, y_train, X_pool, y_pool, pset, toolbox, n_gen=10, pop_size=50, k=3, n_instances=10, mask_pool=None):
+def run_active_learning_ga(X_train, y_train, X_pool, y_pool, pset, toolbox, n_gen=10, pop_size=50, k=3, n_instances=10):
     """
     Runs the Genetic Algorithm loop with Active Learning integration.
-    Optional mask_pool (boolean array) to filter out candidates for querying.
     """
     # Register evaluation function with initial data
     toolbox.register("evaluate", eval_classifier, points=X_train, labels=y_train, toolbox=toolbox)
@@ -119,7 +118,6 @@ def run_active_learning_ga(X_train, y_train, X_pool, y_pool, pset, toolbox, n_ge
     curr_y_train = np.copy(y_train)
     curr_X_pool = np.copy(X_pool)
     curr_y_pool = np.copy(y_pool)
-    curr_mask_pool = np.copy(mask_pool) if mask_pool is not None else np.zeros(len(y_pool), dtype=bool)
 
     # Initial evaluation
     invalid_ind = [ind for ind in pop if not ind.fitness.valid]
@@ -139,18 +137,8 @@ def run_active_learning_ga(X_train, y_train, X_pool, y_pool, pset, toolbox, n_ge
             best_ind = hof[0]
             classifier = GPClassifierWrapper(best_ind, toolbox)
             
-            # Query instances - Filter out imputed samples (if mask exists)
-            valid_indices = np.where(~curr_mask_pool)[0]
-            
-            if len(valid_indices) >= n_instances:
-                # Sub-select from pool for sampling
-                X_pool_valid = curr_X_pool[valid_indices]
-                query_idx_local, _ = uncertainty_sampling(classifier, X_pool_valid, n_instances=n_instances)
-                # Map back to original pool indices
-                query_idx = valid_indices[query_idx_local]
-            else:
-                # Fallback to standard sampling if not enough valid candidates
-                query_idx, _ = uncertainty_sampling(classifier, curr_X_pool, n_instances=min(n_instances, len(curr_X_pool)))
+            # Query instances
+            query_idx, _ = uncertainty_sampling(classifier, curr_X_pool, n_instances=n_instances)
             
             # Update data
             curr_X_train = np.vstack([curr_X_train, curr_X_pool[query_idx]])
@@ -158,7 +146,6 @@ def run_active_learning_ga(X_train, y_train, X_pool, y_pool, pset, toolbox, n_ge
             
             curr_X_pool = np.delete(curr_X_pool, query_idx, axis=0)
             curr_y_pool = np.delete(curr_y_pool, query_idx, axis=0)
-            curr_mask_pool = np.delete(curr_mask_pool, query_idx, axis=0)
             
             print(f"Added {n_instances} samples. New training set size: {len(curr_X_train)}")
             
