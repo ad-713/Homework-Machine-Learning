@@ -18,9 +18,15 @@ The goal is to evaluate and analyze the performance of these approaches on the [
   - [**Step 1: Dataset Preprocessing**](docs/preprocessing.md)
   - [**Step 2: Evolutionary Learning**](docs/genetic_programming.md)
   - [**Step 3: Active Learning**](docs/active_learning.md)
+  - [**Step 4: Ensemble Learning**](docs/ensemble_learning.md)
+  - [**Step 5: Comparative Analysis**](docs/comparative_analysis.md)
+- `experiment/`: Results from the comparative analysis.
+  - `report.md`: Summary table of metrics.
+  - `plots/`: Performance and efficiency visualizations.
 - `processed_data/`: Created by the preprocessing pipeline. Contains split and scaled NumPy archives.
 - `main_preprocessing.py`: Orchestration script for data preparation.
 - `main_genetic_programming.py`: Orchestration script for evolutionary learning.
+- `comparative_analysis.py`: Final script for benchmarking all methods.
 
 ## Implementation Steps
 
@@ -48,7 +54,18 @@ Detailed documentation: [Step 3: Active Learning](docs/active_learning.md)
 - Enhanced the evolutionary loop to update training data every $k$ generations.
 
 ### 4. Ensemble Learning
-*Documentation pending.*
+Detailed documentation: [Step 4: Ensemble Learning](docs/ensemble_learning.md)
+
+- Implemented a `GPEnsembleClassifier` supporting Hard, Soft, and Weighted voting.
+- Leverages the final population of the GA to improve generalization.
+- Reduces prediction variance by combining multiple top-performing individuals.
+
+### 5. Comparative Analysis and Deliverables
+Detailed documentation: [Step 5: Comparative Analysis](docs/comparative_analysis.md)
+
+- Evaluated GA, GA+AL, and GA+AL+EL on common metrics (Accuracy, Precision, Recall, F1).
+- Analyzed computational efficiency and training time trade-offs.
+- Generated performance plots and a comparative summary table.
 
 ## Getting Started
 
@@ -65,4 +82,9 @@ Detailed documentation: [Step 3: Active Learning](docs/active_learning.md)
 3. Run Evolutionary Learning:
    ```bash
    python main_genetic_programming.py
+   ```
+
+4. Run Comparative Analysis:
+   ```bash
+   python comparative_analysis.py
    ```

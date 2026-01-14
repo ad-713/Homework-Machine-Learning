@@ -58,3 +58,5 @@ python main_genetic_programming.py
 ```
 
 The script will output classification reports for each voting method, allowing for direct comparison on the test set.
+
+To see how the ensemble performs relative to the standard GA and GA+AL models, refer to the [**Comparative Analysis**](comparative_analysis.md).

@@ -82,3 +82,5 @@ Added 20 samples. New training set size: 240
    ```
 
 The script will output the progress of the evolution and explicitly log when an Active Learning step occurs and how the training set size changes.
+
+For a full benchmark against the standard GP baseline, see the [**Comparative Analysis**](comparative_analysis.md).
