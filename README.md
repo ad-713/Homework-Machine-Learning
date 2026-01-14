@@ -17,6 +17,7 @@ The goal is to evaluate and analyze the performance of these approaches on the [
 - `docs/`: Detailed documentation for each step.
   - [**Step 1: Dataset Preprocessing**](docs/preprocessing.md)
   - [**Step 2: Evolutionary Learning**](docs/genetic_programming.md)
+  - [**Step 3: Active Learning**](docs/active_learning.md)
 - `processed_data/`: Created by the preprocessing pipeline. Contains split and scaled NumPy archives.
 - `main_preprocessing.py`: Orchestration script for data preparation.
 - `main_genetic_programming.py`: Orchestration script for evolutionary learning.
@@ -39,7 +40,12 @@ Detailed documentation: [Step 2: Evolutionary Learning](docs/genetic_programming
 - Optimized for classification accuracy on raw physical features.
 
 ### 3. Active Learning
-*Documentation pending.*
+Detailed documentation: [Step 3: Active Learning](docs/active_learning.md)
+
+- Integrated the `modAL` library for active sampling.
+- Implemented **Uncertainty Sampling** to dynamically query informative samples from an unlabeled pool.
+- Created a `GPClassifierWrapper` to map GP outputs to probabilities via a sigmoid function.
+- Enhanced the evolutionary loop to update training data every $k$ generations.
 
 ### 4. Ensemble Learning
 *Documentation pending.*
