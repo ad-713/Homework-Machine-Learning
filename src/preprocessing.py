@@ -30,7 +30,7 @@ def apply_pca(X_train, X_test, n_components=0.95):
     X_test_pca = pca.transform(X_test)
     return X_train_pca, X_test_pca, pca
 
-def split_data(df, test_size=0.2, random_state=42):
+def split_data(df, test_size=0.3, random_state=42):
     """
     Split the dataframe into training and testing sets.
     Returns X_train, X_test, y_train, y_test, and weights if available.
