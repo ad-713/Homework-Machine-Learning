@@ -4,4 +4,4 @@ matplotlib
 scikit-learn
 joblib
 deap
-modal
+modAL-python
