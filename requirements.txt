@@ -1,7 +1,8 @@
 pandas
+modAL-python
 numpy
 matplotlib
 scikit-learn
 joblib
 deap
-modAL-python
+seaborn
