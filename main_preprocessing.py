@@ -41,12 +41,12 @@ def main():
     X_train, X_test, y_train, y_test, w_train, w_test, m_train, m_test = split_data(df)
     print(f"Train shape: {X_train.shape}, Test shape: {X_test.shape}")
     
-    print("Scaling features using RobustScaler...")
+    print("Scaling features using PowerTransformer (Yeo-Johnson)...")
     X_train_scaled, X_test_scaled, scaler = scale_features(X_train, X_test)
     joblib.dump(scaler, os.path.join(output_dir, 'scaler.joblib'))
     
-    print("Applying PCA (preserving 90% variance)...")
-    X_train_pca, X_test_pca, pca = apply_pca(X_train_scaled, X_test_scaled, n_components=0.90)
+    print("Applying PCA (preserving 95% variance)...")
+    X_train_pca, X_test_pca, pca = apply_pca(X_train_scaled, X_test_scaled, n_components=0.95)
     joblib.dump(pca, os.path.join(output_dir, 'pca.joblib'))
     print(f"PCA reduced dimensions from {X_train_scaled.shape[1]} to {X_train_pca.shape[1]}")
     
