@@ -48,10 +48,18 @@ Active Learning introduces a small overhead (Uncertainty Sampling and Sigmoid ma
 
 The comparative analysis script automatically generates plots in the `experiment/plots/` directory:
 
-- **Metrics Comparison**: Bar chart comparing Accuracy, Precision, Recall, and F1 across all methods.
-- **Time Comparison**: Comparison of training durations.
-- **Confusion Matrix**: Detailed view of predictions for the final Ensemble model.
-- **ROC Curve**: Analysis of the True Positive vs. False Positive rate for the Ensemble.
+### Performance Comparison
+![Metrics Comparison](../experiment/plots/metrics_comparison.png)
+*Bar chart comparing Accuracy, Precision, Recall, and F1 across all methods.*
+
+### Efficiency Comparison
+![Time Comparison](../experiment/plots/time_comparison.png)
+*Comparison of training durations showing the speedup achieved by Active Learning.*
+
+### Model Specifics (GA+AL+EL)
+![Confusion Matrix](../experiment/plots/confusion_matrix.png)
+![ROC Curve](../experiment/plots/roc_curve.png)
+*Detailed classification performance for the Ensemble model.*
 
 ---
 
