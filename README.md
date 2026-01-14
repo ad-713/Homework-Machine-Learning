@@ -16,6 +16,7 @@ The goal is to evaluate and analyze the performance of these approaches on the [
   - [`genetic_programming.py`](src/genetic_programming.py): Evolutionary learning implementation.
 - `docs/`: Detailed documentation for each step.
   - [**Step 1: Dataset Preprocessing**](docs/preprocessing.md)
+  - [**Step 2: Evolutionary Learning**](docs/genetic_programming.md)
 - `processed_data/`: Created by the preprocessing pipeline. Contains split and scaled NumPy archives.
 - `main_preprocessing.py`: Orchestration script for data preparation.
 - `main_genetic_programming.py`: Orchestration script for evolutionary learning.
@@ -31,7 +32,11 @@ Detailed documentation: [Step 1: Preprocessing](docs/preprocessing.md)
 - Reduced dimensionality from 30 to 20 features using PCA (95% variance).
 
 ### 2. Evolutionary Learning
-*Documentation in progress.*
+Detailed documentation: [Step 2: Evolutionary Learning](docs/genetic_programming.md)
+
+- Implemented Genetic Programming (GP) using the DEAP library.
+- Evolved mathematical expressions using addition, subtraction, and multiplication.
+- Optimized for classification accuracy on raw physical features.
 
 ### 3. Active Learning
 *Documentation pending.*
