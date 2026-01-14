@@ -32,7 +32,7 @@ We implemented a Genetic Programming classifier where individuals represent math
 ### 2.3. Active Learning Integration
 To address the computational cost of evaluating fitness on large datasets, we integrated an Active Learning loop using **Uncertainty Sampling**.
 - **Strategy:** The algorithm iteratively queries samples from an unlabeled pool where the current model is least confident.
-- **Probability Mapping:** GP outputs ($f(x)$) were mapped to probabilities using the logistic sigmoid function:
+- **Probability Mapping:** GP outputs $f(x)$ were mapped to probabilities using the logistic sigmoid function:
   $$P(y=1|x) = \frac{1}{1 + e^{-f(x)}}$$
 - **Workflow:** The training set was updated every 3 generations with the 20 most "uncertain" samples, allowing the GP to focus on the decision boundary.
 
