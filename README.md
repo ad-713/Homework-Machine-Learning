@@ -66,6 +66,15 @@ Detailed documentation: [Step 5: Comparative Analysis](docs/comparative_analysis
 - Evaluated GA, GA+AL, and GA+AL+EL on common metrics (Accuracy, Precision, Recall, F1).
 - Analyzed computational efficiency and training time trade-offs.
 - Generated performance plots and a comparative summary table.
+- Results are stored in the `experiment/` directory, including a [comprehensive report](experiment/report.md).
+
+## Performance Summary
+
+| Approach | Accuracy | F1-Score | Time Speedup |
+| :--- | :--- | :--- | :--- |
+| **GA (Baseline)** | 69.1% | 0.326 | 1x |
+| **GA + AL** | **71.2%** | **0.620** | **~9x faster** |
+| **GA + AL + EL** | 71.1% | 0.487 | ~8x faster |
 
 ## Getting Started
 
