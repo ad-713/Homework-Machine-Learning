@@ -153,7 +153,7 @@ def main():
     preds_al = [1 if func_al(*p) > 0 else 0 for p in X_test_scaled]
     results['GA+AL'] = evaluate_model(y_test_vals, preds_al, elapsed_al)
 
-    # 3. GA + AL + EL
+    # 4. GA + AL + EL
     print("\n>>> Evaluating GA + AL + Ensemble (Soft Voting)...")
     # We use the population from GA+AL run to create ensemble
     start_time = time.time()
