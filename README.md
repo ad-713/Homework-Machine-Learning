@@ -27,7 +27,7 @@ The goal is to evaluate and analyze the performance of these approaches on the [
 - `main_preprocessing.py`: Orchestration script for data preparation.
 - `main_genetic_programming.py`: Orchestration script for evolutionary learning.
 - `comparative_analysis.py`: Final script for benchmarking all methods.
-- [`Project_Report.md`](Project_Report.md): Comprehensive research paper summarizing methodology and findings.
+- [`Project_Report.md`](Project_Report.md): Comprehensive project report summarizing methodology and findings.
 
 ## Implementation Steps
 
