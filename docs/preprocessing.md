@@ -13,7 +13,7 @@ The preprocessing pipeline is orchestrated by [`main_preprocessing.py`](../main_
 3. **Missing Value Handling (SimpleImputer)**
 4. **Label Encoding**
 5. **Stratified Data Splitting**
-6. **Feature Scaling (PowerTransformer)**
+6. **Feature Scaling (RobustScaler)**
 7. **Dimensionality Reduction (PCA)**
 
 ---
@@ -49,8 +49,8 @@ Significant outliers were detected in several features, often related to the imp
 | ... | ... | ... |
 
 **Decision:**
-1.  **PowerTransformer (Yeo-Johnson):** Initially, standard scaling and robust scaling led to unbalanced variance in PCA due to extreme heavy tails. We switched to **`PowerTransformer`**, which applies a non-linear transformation to stabilize variance and make features more Gaussian. This prevents extreme outliers from dominating the PCA components.
-2.  **PCA Variance:** To ensure the maximum amount of information is preserved for the models, the PCA variance retention was set to **95%**.
+1.  **RobustScaler:** Standard scaling (Mean/Std) is sensitive to these outliers. We switched to **`RobustScaler`** (Median/IQR) to effectively handle the heavy tails and outliers.
+2.  **PCA Variance:** To reduce the impact of noise and outliers further, the PCA variance retention was adjusted to **90%** (from 95%).
 
 ---
 
@@ -80,13 +80,13 @@ The dataset is split into training and testing sets using an **70/30 ratio**.
 
 ## 5. Normalization and Dimensionality Reduction
 
-### Feature Scaling (PowerTransformer)
-We apply `PowerTransformer` (using the Yeo-Johnson method) to transform features. This method stabilizes variance and minimizes the impact of heavy tails (outliers) by mapping the data to a more Gaussian distribution. This is essential for PCA, ensuring that components are not dominated by a few extreme values.
+### Feature Scaling (RobustScaler)
+We apply `RobustScaler` to transform features. Unlike `StandardScaler`, `RobustScaler` uses the median and the interquartile range (IQR), making it robust to the significant outliers identified during EDA.
 
 ### Dimensionality Reduction (PCA)
 To improve computational efficiency and reduce noise:
-- **Variance Retained:** **95%**.
-- **Benefit:** Reduces the feature space while preserving almost all original information, filtering out only the most insignificant noise components.
+- **Variance Retained:** **90%**.
+- **Benefit:** Reduces dimensionality while keeping the most significant signal, filtering out variance that might be attributed to noise or outliers.
 
 ---
 
@@ -98,7 +98,7 @@ After running the pipeline, the following artifacts are generated in the `proces
 | --- | --- |
 | `train_data.npz` | Compressed NumPy archive containing `X_train`, `y_train`, and `w_train`. |
 | `test_data.npz` | Compressed NumPy archive containing `X_test`, `y_test`, and `w_test`. |
-| `scaler.joblib` | The fitted `PowerTransformer` object. |
+| `scaler.joblib` | The fitted `RobustScaler` object. |
 | `pca.joblib` | The fitted `PCA` object. |
 | `label_encoder.joblib` | The fitted `LabelEncoder` object. |
 

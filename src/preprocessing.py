@@ -1,4 +1,4 @@
-from sklearn.preprocessing import PowerTransformer, LabelEncoder
+from sklearn.preprocessing import RobustScaler, LabelEncoder
 from sklearn.model_selection import train_test_split
 from sklearn.decomposition import PCA
 import pandas as pd
@@ -84,15 +84,14 @@ def encode_labels(df):
 
 def scale_features(X_train, X_test):
     """
-    Scale features using PowerTransformer (Yeo-Johnson) to handle outliers
-    and normalize distributions for better PCA results.
+    Scale features using RobustScaler to handle outliers.
     """
-    scaler = PowerTransformer(method='yeo-johnson')
+    scaler = RobustScaler()
     X_train_scaled = scaler.fit_transform(X_train)
     X_test_scaled = scaler.transform(X_test)
     return X_train_scaled, X_test_scaled, scaler
 
-def apply_pca(X_train, X_test, n_components=0.95):
+def apply_pca(X_train, X_test, n_components=0.90):
     """
     Apply PCA to reduce dimensionality while preserving a certain percentage of variance.
     """
